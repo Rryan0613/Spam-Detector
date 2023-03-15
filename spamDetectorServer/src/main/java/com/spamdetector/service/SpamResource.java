@@ -36,7 +36,10 @@ public class SpamResource {
     @Produces("application/json")
     public Response getSpamResults() {
 //       TODO: return the test results list of TestFile, return in a Response object
-
+/*
+{"spamProbRounded":"0.00000","file":"00006.654c4ec7c059531accf388a807064363","spamProbability":5.901245803391957E-62,"actualClass":"Ham"}
+getSpamResults must get the SpamProbabilityRounded, fileName, spamProbability, actualClass
+ */
         return null;
     }
 
@@ -87,7 +90,9 @@ public class SpamResource {
     @Produces("application/json")
     public Response getPrecision() {
         //      TODO: return the precision of the detector, return in a Response object
-
+/*
+this is supposed to take the formula of TruePositives / FalsePositives + TruePositives, take Accuracy as an example
+ */
         return null;
     }
 
