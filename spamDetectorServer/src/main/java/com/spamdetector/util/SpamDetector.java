@@ -5,25 +5,26 @@ import com.spamdetector.domain.TestFile;
 import java.io.*;
 import java.util.*;
 
-/**
- * TODO: This class will be implemented by you
- */
 public class SpamDetector {
     private Map<String, Integer> trainOnDirectory(File directory) throws IOException {
         Map<String, Integer> wordCounts = new HashMap<>();
-        for (File file : directory.listFiles()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] words = line.split("\\s+");
-                    for (String word : words) {
-                        wordCounts.put(word, wordCounts.getOrDefault(word, 0) + 1);
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        String[] words = line.split("\\s+");
+                        for (String word : words) {
+                            wordCounts.put(word, wordCounts.getOrDefault(word, 0) + 1);
+                        }
                     }
                 }
             }
         }
         return wordCounts;
     }
+
 
     private int fileCount(File directory) {
         File[] files = directory.listFiles();
@@ -33,7 +34,7 @@ public class SpamDetector {
         return files.length;
     }
 
-    public List<TestFile> trainAndTest(File mainDirectory)throws IOException {
+    public List<TestFile> trainAndTest(File mainDirectory) throws IOException {
         List<TestFile> testFiles = new ArrayList<>();
 
         Map<String, Integer> hamWordCounts = trainOnDirectory(new File(mainDirectory, "train/ham"));
