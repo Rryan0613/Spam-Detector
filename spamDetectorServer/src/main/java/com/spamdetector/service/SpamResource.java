@@ -1,5 +1,6 @@
 package com.spamdetector.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spamdetector.domain.TestFile;
 import com.spamdetector.util.SpamDetector;
 import jakarta.ws.rs.GET;
@@ -7,14 +8,18 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
+import jdk.incubator.vector.VectorOperators;
 
 @Path("/spam")
 public class SpamResource {
 
-//    your SpamDetector Class responsible for all the SpamDetecting logic
+    //    your SpamDetector Class responsible for all the SpamDetecting logic
     SpamDetector detector = new SpamDetector();
 
 
@@ -23,9 +28,8 @@ public class SpamResource {
         System.out.print("Training and testing the model, please wait");
 
 //      TODO: call  this.trainAndTest();
-
-
     }
+
     @GET
     @Produces("application/json")
     public Response getSpamResults() {
@@ -38,16 +42,50 @@ public class SpamResource {
     @Path("/accuracy")
     @Produces("application/json")
     public Response getAccuracy() {
-//      TODO: return the accuracy of the detector, return in a Response object
+        //Roman see if this works for getAccuracy, it was from ChatGPT -yours truly... 8====D <3.
+        List<TestFile> testFiles = detector.trainAndTest(new File("data/test")); // replace with actual path
+        int truePositives = 0;
+        int falsePositives = 0;
+        int trueNegative = 0;
+        int placeholder = 0;
+        double accuracy = 0;
+        double threshold = 0.5;
 
-        return null;
+        for (TestFile file : testFiles) {
+            if (file.getSpamProbability() >= threshold) {
+                String actualClass = file.getActualClass();
+                if (actualClass.equals("/spam")) {
+                    truePositives++;
+                } else if (actualClass.equals("/ham")) {
+                    falsePositives++;
+                }
+            }
+
+            if (file.getSpamProbability() <= threshold) {
+                String actualClass = file.getActualClass();
+                if (actualClass.equals("/spam")) {
+                    placeholder++;
+                    /*
+                    placeholder is here because we don't need anything else other than truePositive, falsePositives,
+                    and trueNegative, so it will just be an empty variable
+                    */
+                } else if (actualClass.equals("/ham")) {
+                    trueNegative++;
+                }
+            }
+        }
+        accuracy = (double) truePositives / (truePositives + falsePositives);
+        accuracy = truePositives + trueNegative; // check dis
+
+
+        return Response.ok().build();
     }
 
     @GET
     @Path("/precision")
     @Produces("application/json")
     public Response getPrecision() {
-       //      TODO: return the precision of the detector, return in a Response object
+        //      TODO: return the precision of the detector, return in a Response object
 
         return null;
     }
