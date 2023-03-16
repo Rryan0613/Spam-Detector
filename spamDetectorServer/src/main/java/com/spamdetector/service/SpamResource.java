@@ -99,9 +99,9 @@ public class SpamResource {
     @GET
     @Path("/precision")
     @Produces("application/json")
-    public Response getPrecision() {
+    public Response getPrecision()throws IOException {
         //      TODO: return the precision of the detector, return in a Response object
-        List<TestFile> testFiles = detector.trainAndTest(new File("data/test")); // replace with actual path
+        List<TestFile> testFiles = detector.trainAndTest(new File("data/test"));
         int truePositives = 0;
         int falsePositives = 0;
         int trueNegative = 0;
