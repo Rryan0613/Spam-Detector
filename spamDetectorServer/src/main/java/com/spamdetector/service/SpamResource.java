@@ -26,21 +26,32 @@ public class SpamResource {
     List<TestFile> testResults = new ArrayList<>();
 
     SpamResource(){
-//        TODO: load resources, train and test to improve performance on the endpoint calls
+//      TODO: load resources, train and test to improve performance on the endpoint calls
         System.out.print("Training and testing the model, please wait");
 
 //      TODO: call  this.trainAndTest();
+        this.trainAndTest();
     }
 
     @GET
     @Produces("application/json")
     public Response getSpamResults() {
 //       TODO: return the test results list of TestFile, return in a Response object
-/*
-{"spamProbRounded":"0.00000","file":"00006.654c4ec7c059531accf388a807064363","spamProbability":5.901245803391957E-62,"actualClass":"Ham"}
-getSpamResults must get the SpamProbabilityRounded, fileName, spamProbability, actualClass
- */
-        return null;
+        List<Map<String,String>> results = new ArrayList<>();
+        for (TestFile testFile : testResults) {
+            String spamProbRounded = String.format("%.5f", testFile.getSpamProbability());
+            String fileName = testFile.getFilename();
+            String spamProbability = String.valueOf(testFile.getSpamProbability());
+            String actualClass = testFile.getActualClass();
+            Map<String, String> resultMap = Map.of(
+                    "spamProbRounded", spamProbRounded,
+                    "fileName", fileName,
+                    "spamProbability", spamProbability,
+                    "actualClass", actualClass
+            );
+            results.add(resultMap);
+        }
+        return Response.ok(results).build();
     }
 
     @GET
@@ -90,10 +101,41 @@ getSpamResults must get the SpamProbabilityRounded, fileName, spamProbability, a
     @Produces("application/json")
     public Response getPrecision() {
         //      TODO: return the precision of the detector, return in a Response object
-/*
-this is supposed to take the formula of TruePositives / FalsePositives + TruePositives, take Accuracy as an example
- */
-        return null;
+        List<TestFile> testFiles = detector.trainAndTest(new File("data/test")); // replace with actual path
+        int truePositives = 0;
+        int falsePositives = 0;
+        int trueNegative = 0;
+        int placeholder = 0;
+        double precision = 0;
+        double threshold = 0.5;
+
+        for (TestFile file : testFiles) {
+            if (file.getSpamProbability() >= threshold) {
+                String actualClass = file.getActualClass();
+                if (actualClass.equals("/spam")) {
+                    truePositives++;
+                } else if (actualClass.equals("/ham")) {
+                    falsePositives++;
+                }
+            }
+
+            if (file.getSpamProbability() <= threshold) {
+                String actualClass = file.getActualClass();
+                if (actualClass.equals("/spam")) {
+                    placeholder++;
+                    /*
+                    placeholder is here because we don't need anything else other than truePositive, falsePositives,
+                    and trueNegative, so it will just be an empty variable
+                    */
+                } else if (actualClass.equals("/ham")) {
+                    trueNegative++;
+                }
+            }
+        }
+        precision = truePositives/ falsePositives+truePositives; // should the precision function be a array or a list
+
+
+        return Response.ok().build();
     }
 
     private List<TestFile> trainAndTest() throws IOException {
