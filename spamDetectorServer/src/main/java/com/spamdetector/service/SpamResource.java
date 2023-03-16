@@ -25,7 +25,7 @@ public class SpamResource {
     ObjectMapper mapper = new ObjectMapper();
     List<TestFile> testResults = new ArrayList<>();
 
-    SpamResource(){
+    SpamResource()throws IOException{
 //      TODO: load resources, train and test to improve performance on the endpoint calls
         System.out.print("Training and testing the model, please wait");
 
