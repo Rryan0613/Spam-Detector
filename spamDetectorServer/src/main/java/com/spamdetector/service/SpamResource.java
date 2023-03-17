@@ -1,5 +1,6 @@
 package com.spamdetector.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spamdetector.domain.TestFile;
 import com.spamdetector.util.SpamDetector;
@@ -9,142 +10,133 @@ import jakarta.ws.rs.Produces;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
-import jdk.incubator.vector.VectorOperators;
+
+
 
 @Path("/spam")
 public class SpamResource {
+    // URL of the directory containing the test files
+    URL url = getClass().getResource("/spam");
 
-    //    your SpamDetector Class responsible for all the SpamDetecting logic
-    SpamDetector detector = new SpamDetector();
+    // Object mapper for converting Java objects to JSON strings
     ObjectMapper mapper = new ObjectMapper();
-    List<TestFile> testResults = new ArrayList<>();
 
-    SpamResource()throws IOException{
-//      TODO: load resources, train and test to improve performance on the endpoint calls
-        System.out.print("Training and testing the model, please wait");
+    // List of TestFile objects containing the results of training and testing the SpamDetector
+    List<TestFile> testResults;
 
-//      TODO: call  this.trainAndTest();
-        this.trainAndTest();
+    // Instance of SpamDetector responsible for all the spam detection logic
+    SpamDetector detector = new SpamDetector();
+
+    /**
+     * Constructor that loads resources, trains and tests the SpamDetector to improve
+     * performance on endpoint calls.
+     */
+    public SpamResource() throws IOException {
+        File mainDirectory = new File("/data");
+
+        // Train and test the detector on the files in the "/data" directory
+        try {
+            this.detector.trainAndTest(mainDirectory);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
+    /**
+     * Endpoint for getting the frequency of words in the test files.
+     * Returns the frequency map as a JSON string wrapped in a Response object.
+     */
     @GET
     @Produces("application/json")
-    public Response getSpamResults() {
-//       TODO: return the test results list of TestFile, return in a Response object
-        List<Map<String,String>> results = new ArrayList<>();
-        for (TestFile testFile : testResults) {
-            String spamProbRounded = String.format("%.5f", testFile.getSpamProbability());
-            String fileName = testFile.getFilename();
-            String spamProbability = String.valueOf(testFile.getSpamProbability());
-            String actualClass = testFile.getActualClass();
-            Map<String, String> resultMap = Map.of(
-                    "spamProbRounded", spamProbRounded,
-                    "fileName", fileName,
-                    "spamProbability", spamProbability,
-                    "actualClass", actualClass
-            );
-            results.add(resultMap);
+    public Response getSpamResults() throws IOException {
+        // Convert the URL of the test file directory to a File object
+        File data;
+        try {
+            data = new File(url.toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
-        return Response.ok(results).build();
+
+        // Calculate the frequency of words in the test files using the SpamDetector
+        SpamDetector parser = new SpamDetector();
+        Map<String, Integer> freq = parser.wordFreqDir(data);
+
+        // Create a Response object containing the frequency map as a JSON string
+        Response response = Response.status(200)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Content-Type", "application/json")
+                .entity(mapper.writeValueAsString(freq))
+                .build();
+
+        return response;
     }
 
+    /**
+     * Endpoint for getting the accuracy of the SpamDetector on the test files.
+     * Returns the accuracy as a JSON string wrapped in a Response object.
+     */
     @GET
     @Path("/accuracy")
     @Produces("application/json")
-    public Response getAccuracy() {
+    public Response getAccuracy() throws IOException {
+        // Convert the URL of the test file directory to a File object
+        File mainDirectory;
         try {
-            List<TestFile> testFiles = detector.trainAndTest(new File("data/test"));
-            int truePositives = 0;
-            int falsePositives = 0;
-            int trueNegative = 0;
-            int placeholder = 0;
-            double accuracy = 0;
-            double threshold = 0.5;
-
-            for (TestFile file : testFiles) {
-                if (file.getSpamProbability() >= threshold) {
-                    String actualClass = file.getActualClass();
-                    if (actualClass.equals("/spam")) {
-                        truePositives++;
-                    } else if (actualClass.equals("/ham")) {
-                        falsePositives++;
-                    }
-                }
-
-                if (file.getSpamProbability() <= threshold) {
-                    String actualClass = file.getActualClass();
-                    if (actualClass.equals("/spam")) {
-                        placeholder++;
-                    } else if (actualClass.equals("/ham")) {
-                        trueNegative++;
-                    }
-                }
-            }
-            accuracy = (double) truePositives / (truePositives + falsePositives);
-            accuracy = truePositives + trueNegative;
+            mainDirectory = new File(url.toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return Response.ok().build();
+
+        // Train and test the detector on the files in the "/data" directory
+        testResults = detector.trainAndTest(mainDirectory);
+
+        // Compute the accuracy of the detector on the test files
+        Map<String, Double> accuracy = detector.getAccuracy(testResults);
+
+        // Convert the accuracy to a JSON string
+        String json = mapper.writeValueAsString(accuracy);
+
+        // Create a Response object containing the accuracy as a JSON string
+        Response response = Response.status(200)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Content-Type", "application/json")
+                .entity(json)
+                .build();
+
+        // Return the Response object
+        return response;
     }
 
-    @GET
-    @Path("/precision")
-    @Produces("application/json")
-    public Response getPrecision()throws IOException {
-        //      TODO: return the precision of the detector, return in a Response object
-        List<TestFile> testFiles = detector.trainAndTest(new File("data/test"));
-        int truePositives = 0;
-        int falsePositives = 0;
-        int trueNegative = 0;
-        int placeholder = 0;
-        double precision = 0;
-        double threshold = 0.5;
-
-        for (TestFile file : testFiles) {
-            if (file.getSpamProbability() >= threshold) {
-                String actualClass = file.getActualClass();
-                if (actualClass.equals("/spam")) {
-                    truePositives++;
-                } else if (actualClass.equals("/ham")) {
-                    falsePositives++;
-                }
-            }
-
-            if (file.getSpamProbability() <= threshold) {
-                String actualClass = file.getActualClass();
-                if (actualClass.equals("/spam")) {
-                    placeholder++;
-                    /*
-                    placeholder is here because we don't need anything else other than truePositive, falsePositives,
-                    and trueNegative, so it will just be an empty variable
-                    */
-                } else if (actualClass.equals("/ham")) {
-                    trueNegative++;
-                }
-            }
-        }
-        precision = truePositives/ falsePositives+truePositives; // should the precision function be a array or a list
-
-
-        return Response.ok().build();
-    }
-
-    private List<TestFile> trainAndTest() throws IOException {
+    public List<TestFile> trainAndTest() throws IOException {
         if (this.detector==null){
             this.detector = new SpamDetector();
         }
+        //      TODO: return the precision of the detector, return in a Response object
+        URL url = getClass().getResource("/data");
+
+        // Create a new File object to represent the "/data" directory
+        File mainDirectory;
+        try {
+            assert url != null;
+            mainDirectory = new File(url.toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
 
 //        TODO: load the main directory "data" here from the Resources folder
-        File mainDirectory = null;
         return this.detector.trainAndTest(mainDirectory);
     }
+
+
+
+
+
+
 }
