@@ -38,7 +38,7 @@ public class SpamResource {
      * Constructor that loads resources, trains and tests the SpamDetector to improve
      * performance on endpoint calls.
      */
-    public SpamResource() throws IOException {
+    public SpamResource(){
         File mainDirectory = new File("/data");
 
         // Train and test the detector on the files in the "/data" directory
@@ -59,6 +59,7 @@ public class SpamResource {
         // Convert the URL of the test file directory to a File object
         File data;
         try {
+            assert url != null;
             data = new File(url.toURI());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -89,6 +90,7 @@ public class SpamResource {
         // Convert the URL of the test file directory to a File object
         File mainDirectory;
         try {
+            assert url != null;
             mainDirectory = new File(url.toURI());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -133,8 +135,6 @@ public class SpamResource {
 //        TODO: load the main directory "data" here from the Resources folder
         return this.detector.trainAndTest(mainDirectory);
     }
-
-
 
 
 
