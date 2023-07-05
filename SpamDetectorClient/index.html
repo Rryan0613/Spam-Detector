@@ -1,9 +1,14 @@
+<!--This HTML file creates a spam detector dashboard with a navigation menu,
+ a section displaying the performance of the spam detector model,
+ and a table displaying the results of the spam application algorithm.
+ It also includes links to external stylesheets and scripts,
+ as well as Google Analytics tracking code.-->
 <!doctype html>
 <html class="no-js" lang="">
 
 <head>
   <meta charset="utf-8">
-  <title>Spam Detector - Dashboard</title>
+  <title>Spam Detector Dashboard</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -18,57 +23,66 @@
 
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/loading.css">
 
   <meta name="theme-color" content="#fafafa">
-  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 </head>
 
 <body>
 
-<!-- Add your site or application content here -->
-<nav>
-  <input type="checkbox" id="check">
-  <label for="check" class="checkbtn">
-    <i class="fas fa-bars"></i>
-  </label>
-  <label class="logo">Spam Detector Dashboard</label>
-  <ul>
-    <li><a href="#">Dashboard</a></li>
-    <li><a href="about.html">About</a></li>
-  </ul>
-</nav>
-<div id="container1">
-  <h2>Spam Analysis</h2>
-  <p>The table below displays the results of our spam detection algorithm.</p>
-  <table>
-    <tr>
-      <th>File</th>
-      <th>Spam Probability (%)</th>
-      <th>Class</th>
-    </tr>
-  </table>
-</div>
-<h2 id="performance">Performance Of The Model</h2>
-<form>
-  <label for="fname">Accuracy:</label><br>
-  <input type="text" id="fname" name="fname"><br>
-  <label for="lname">Precision:</label><br>
-  <input type="text" id="lname" name="lname">
-</form>
-<div id="box">
-  <p>copyright @ CSCI2020U - Winter 2023</p>
-</div>
-<script src="js/vendor/modernizr-3.11.2.min.js"></script>
-<script src="js/plugins.js"></script>
-<script src="js/main.js"></script>
+  <!-- Add your site or application content here -->
+  <header><h1>Spam Detector Dashboard</h1></header>
+  <div class="sidebar">
+      <nav>
+        <ul>
+          <h3><a href="index.html" >Dashboard</a></h3>
+          <h3><a href="about.html">About</a></h3>
+        </ul>
+      </nav>
+  </div>
+  <div class="sidebar2">
+    <h3>Performance of the model</h3>
+    <p >Accuracy</p>
+    <div id="accuracy" class="output-box">
 
-<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
-<script>
-  window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
-  ga('create', 'UA-XXXXX-Y', 'auto'); ga('set', 'anonymizeIp', true); ga('set', 'transport', 'beacon'); ga('send', 'pageview')
-</script>
-<script src="https://www.google-analytics.com/analytics.js" async></script>
-<section></section>
+    </div>
+    <p >Precision</p>
+    <div id="precision" class="output-box">
+
+    </div>
+  </div>
+
+<!--  </div>-->
+  <section>
+    <div class="section-inner">
+      <h3>Spam Analysis Dashboard</h3>
+      <p>The table below displays the result of our spam application algorithm</p>
+      <div class="table-wrapper">
+        <table id="chart">
+          <thead>
+          <tr>
+            <th class="table-color" style="width: 60%;">File</th>
+            <th class="table-color" style="width: 25%">Spam Probability (%)</th>
+            <th class="table-color" style="width: 10%">Class</th>
+          </tr>
+          </thead>
+          <tbody id="data"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <script src="js/vendor/modernizr-3.11.2.min.js"></script>
+  <script src="js/plugins.js"></script>
+  <script src="js/main.js"></script>
+  <script defer src="js/api.js"></script>
+
+  <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-XXXXX-Y', 'auto'); ga('set', 'anonymizeIp', true); ga('set', 'transport', 'beacon'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async></script>
 </body>
 
 </html>

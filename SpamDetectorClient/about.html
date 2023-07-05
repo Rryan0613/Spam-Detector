@@ -1,3 +1,7 @@
+<!--This HTML file creates an "About" page for the Spam Detector website,
+ with a header section containing the website title, a navigation menu,
+  and a body section displaying information about the team behind the website.
+   It also includes links to external stylesheets.-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,40 +9,19 @@
   <title>Spam Detector - About</title>
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/main.css">
-  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 </head>
 <body>
-<nav>
-  <input type="checkbox" id="check">
-  <label for="check" class="checkbtn">
-    <i class="fas fa-bars"></i>
-  </label>
-  <label class="logo">Spam Detector About Page</label>
-  <ul>
-    <li><a href="index.html">Dashboard</a></li>
-    <li><a href="#">About</a></li>
-  </ul>
-</nav>
-<div id="container2">
-  <h1>About</h1>
-  <p>
-    For this assignment we are creating a spam detector to filter out the spam.
-    The spam detector will use a dataset of E-Mails (spam or otherwise) to train your program to recognize whether or not new E-Mails are spam.
-    The program will use a unigram approach, where each word is counted and associated with whether or not the message is spam.
-    Our program will calculate probabilities based on each word’s frequency.
-  </p>
-  <br>
-  <br>
-  <h1>Our team</h1>
-  <br>
-  <p>
-    This website was brought to you by:
-  <li>Jathushan Vishnukaran</li>
-  <li>Ryan Liu</li>
-  </p>
-</div>
-<div id="box">
-  <p>copyright @ CSCI2020U - Winter 2023</p>
-</div>
+<section>
+  <header><h1>Spam Detector Dashboard</h1></header>
+  <div class="sidebar">
+    <nav>
+      <ul>
+        <h3><a href="index.html">Dashboard</a></h3>
+        <h3><a href="about.html">About</a></h3>
+      </ul>
+    </nav>
+  </div>
+</section>
+
 </body>
 </html>
